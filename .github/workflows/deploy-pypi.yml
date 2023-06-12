@@ -1,0 +1,10 @@
+name: Deploy on PyPI
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  deploy:
+    uses: greenbone/workflows/.github/workflows/deploy-pypi.yml@main
+    secrets: inherit
