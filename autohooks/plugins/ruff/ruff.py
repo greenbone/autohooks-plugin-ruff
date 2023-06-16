@@ -73,7 +73,7 @@ def precommit(
                     capture_output=True,
                 )
                 ok(f"Linting {file.path} was successful.")
-            except subprocess.CalledProcessError as e:  # pylint: disable=C0103
+            except subprocess.CalledProcessError as e:
                 ret = e.returncode
                 format_errors = (
                     e.stdout.decode(
