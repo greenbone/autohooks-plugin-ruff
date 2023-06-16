@@ -68,11 +68,11 @@ def precommit(
         for file in files:
             try:
                 subprocess.run(
-                    cmd + [str(file.path)],
+                    cmd + [str(file.absolute_path())],
                     check=True,
                     capture_output=True,
                 )
-                ok(f"ruff {str(file.path)}")
+                ok(f"Linting {file.path} was successful.")
             except subprocess.CalledProcessError as e:  # pylint: disable=C0103
                 ret = e.returncode
                 format_errors = (
@@ -87,13 +87,8 @@ def precommit(
                         error(line)
                     else:
                         out(line)
-                continue
             finally:
                 if report_progress:
                     report_progress.update()
 
-        if ret:
-            error("ruff check raised some errors")
-        else:
-            ok("ruff check was successful")
         return ret
