@@ -37,15 +37,16 @@ To activate the ruff autohooks plugin please add the following setting to your
 pre-commit = ["autohooks.plugins.ruff"]
 ```
 
-What the plugin actually does is `ruff check .` on git commit, so you should be able to use
-the exact same settings as in [ruff's docs](https://beta.ruff.rs/docs/settings/).
+What the plugin actually does is `ruff check .` on git commit, so you should be
+able to use the exact same settings as in [ruff's docs](https://beta.ruff.rs/docs/settings/).
 
 ## Notes
 
-This project only runs ruff as a pre-commit, so, all features from ruff should be
-available too!
+This project only runs ruff as a pre-commit hook, so, all features from ruff
+should be available too.
 
 To activate this pre-commit hook remember to run this command before you start:
+
 ```shell
 poetry run autohooks activate --mode poetry
 ```
@@ -62,15 +63,8 @@ on GitHub. Bigger changes need to be discussed with the development team via the
 [issues section at GitHub](https://github.com/greenbone/autohooks-plugin-ruff/issues)
 first.
 
-You can use the same development system by running:
-
-```shell
-# Will raise a Python3.7 docker container with your git creds + poetry>=1.5.1,<1.6
-make dev
-```
-
 ## License
 
-Copyright (C) 2019 - 2022 [Greenbone AG](https://www.greenbone.net/)
+Copyright (C) 2023 [Greenbone AG](https://www.greenbone.net/)
 
 Licensed under the [GNU General Public License v3.0 or later](LICENSE).
