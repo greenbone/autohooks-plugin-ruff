@@ -1,0 +1,5 @@
+[tool.autohooks.plugins.ruff]
+arguments = [
+    "--test", "foo,bar",
+    "--foo", "bar",
+]
