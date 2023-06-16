@@ -7,8 +7,7 @@ on:
   pull_request:
 
 jobs:
-  check-and-test:
-    name: Check and test
+  linting:
     strategy:
       matrix:
         python-version:
@@ -17,9 +16,24 @@ jobs:
           - "3.9"
           - "3.10"
           - "3.11"
-    uses: greenbone/workflows/.github/workflows/ci-python.yml@main
+    name: Linting
+    uses: greenbone/workflows/.github/workflows/lint-python.yml@main
     with:
       lint-packages: autohooks tests
+      python-version: ${{ matrix.python-version }}
+
+  test:
+    strategy:
+      matrix:
+        python-version:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+    name: Run tests
+    uses: greenbone/workflows/.github/workflows/test-python.yml@main
+    with:
       python-version: ${{ matrix.python-version }}
 
   codecov:
