@@ -3,18 +3,23 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-import unittest
+# pylint: disable=ungrouped-imports,wrong-import-order
+
 from pathlib import Path
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from autohooks.api.git import StatusEntry
 from autohooks.config import load_config_from_pyproject_toml
+from pontos.testing import temp_file
 
-from autohooks.plugins.ruff.ruff import (DEFAULT_ARGUMENTS,
-                                         check_ruff_installed,
-                                         get_ruff_arguments, get_ruff_config,
-                                         precommit)
+from autohooks.plugins.ruff.ruff import (
+    DEFAULT_ARGUMENTS,
+    check_ruff_installed,
+    get_ruff_arguments,
+    get_ruff_config,
+    precommit,
+)
 
 
 def get_test_config_path(name):
@@ -23,27 +28,29 @@ def get_test_config_path(name):
 
 class AutohooksRuffTestCase(TestCase):
     def test_ruff_installed(self):
-        with self.assertRaises(RuntimeError), patch(
-            "importlib.util.find_spec", return_value=None
-        ):
+        with self.assertRaisesRegex(
+            RuntimeError,
+            "Could not find ruff. Please add ruff to your python environment",
+        ), patch("importlib.util.find_spec", return_value=None):
             check_ruff_installed()
 
     def test_get_ruff_config(self):
         config_path = get_test_config_path("pyproject.test.toml")
         self.assertTrue(config_path.is_file())
 
-        autohooksconfig = load_config_from_pyproject_toml(config_path)
+        autohooks_config = load_config_from_pyproject_toml(config_path)
 
-        ruff_config = get_ruff_config(autohooksconfig.get_config())
+        ruff_config = get_ruff_config(autohooks_config.get_config())
         self.assertEqual(
             ruff_config.get_value("arguments"),
             ["--test", "foo,bar", "--foo", "bar"],
         )
 
-    def test_get_ruff_arguments(self):
+    def test_get_default_ruff_arguments(self):
         args = get_ruff_arguments(None)
         self.assertEqual(args, DEFAULT_ARGUMENTS)
 
+    def test_get_ruff_arguments(self):
         config_path = get_test_config_path("pyproject.test.toml")
         args = get_ruff_arguments(
             load_config_from_pyproject_toml(config_path).get_config()
@@ -51,22 +58,53 @@ class AutohooksRuffTestCase(TestCase):
         self.assertEqual(args, ["--test", "foo,bar", "--foo", "bar"])
 
     @patch("autohooks.plugins.ruff.ruff.get_staged_status")
-    @patch("autohooks.plugins.ruff.ruff.ok")
-    def test_precommit_no_files(self, _ok_mock, get_staged_status_mock):
+    def test_precommit_no_files(
+        self,
+        get_staged_status_mock: MagicMock,
+    ):
         get_staged_status_mock.return_value = []
         ret = precommit()
-        self.assertFalse(ret)
 
-    @unittest.skip("still to do")
+        self.assertEqual(ret, 0)
+
+    @patch("autohooks.plugins.ruff.ruff.get_ruff_arguments")
+    @patch("autohooks.plugins.ruff.ruff.get_ruff_config")
+    @patch("autohooks.plugins.ruff.ruff.ok")
+    @patch("autohooks.plugins.ruff.ruff.out")
+    @patch("autohooks.plugins.ruff.ruff.error")
+    @patch("autohooks.plugins.ruff.ruff.get_staged_status")
     def test_precommit_errors(
         self,
-        staged_mock,
-        _error_mock,
-        _out_mock,
-        _ok_mock,  # _mock_stdout
+        get_staged_status_mock: MagicMock,
+        error_mock: MagicMock,
+        out_mock: MagicMock,
+        ok_mock: MagicMock,
+        _get_ruff_config,
+        get_ruff_arguments_mock: MagicMock,
     ):
-        ret = precommit()
-        self.assertTrue(ret)
+        code = """import subprocess
+status = subprocess.Popen(
+    cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+"""
+        get_ruff_arguments_mock.return_value = DEFAULT_ARGUMENTS
+
+        with temp_file(code, name="test.py") as file:
+            get_staged_status_mock.return_value = [
+                StatusEntry(
+                    status_string=f"M  {file.name}",
+                    root_path=file.parent,
+                )
+            ]
+
+            ret = precommit()
+
+            ok_mock.assert_not_called()
+            out_mock.assert_called_once_with("Found 1 error.")
+            error_mock.assert_called_once_with(
+                f"{file.absolute()}:3:5: F821 Undefined name `cmd`"
+            )
+
+            self.assertEqual(ret, 1)
 
     @patch("autohooks.plugins.ruff.ruff.get_ruff_arguments")
     @patch("autohooks.plugins.ruff.ruff.get_ruff_config")
@@ -76,27 +114,26 @@ class AutohooksRuffTestCase(TestCase):
     @patch("autohooks.plugins.ruff.ruff.get_staged_status")
     def test_precommit_ok(
         self,
-        staged_mock,
-        _error_mock,
-        _out_mock,
-        _ok_mock,  # _mock_stdout
+        get_staged_status_mock: MagicMock,
+        error_mock: MagicMock,
+        out_mock: MagicMock,
+        ok_mock: MagicMock,
         _get_ruff_config,
-        _get_ruff_arguments_mock,
+        get_ruff_arguments_mock: MagicMock,
     ):
-        _get_ruff_arguments_mock.return_value = DEFAULT_ARGUMENTS
+        get_ruff_arguments_mock.return_value = DEFAULT_ARGUMENTS
 
-        test_case_list = [
-            "test_ruff.exe",
-            str(Path(__file__)),
+        get_staged_status_mock.return_value = [
+            StatusEntry(
+                status_string="M  test_ruff.py",
+                root_path=Path(__file__).parent,
+            )
         ]
-        for test_case in test_case_list:
-            with self.subTest(test_case):
-                staged_mock.return_value = [
-                    StatusEntry(
-                        status_string=f"M  {test_case}",
-                        root_path=Path(__file__).parent,
-                    )
-                ]
-                ret = precommit()
-                # Returncode 0 -> no errors
-                self.assertFalse(ret)
+        ret = precommit()
+
+        error_mock.assert_not_called()
+        out_mock.assert_not_called()
+        ok_mock.assert_called_once_with("Linting test_ruff.py was successful.")
+
+        # Returncode 0 -> no errors
+        self.assertEqual(ret, 0)
