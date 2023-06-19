@@ -55,7 +55,7 @@ def precommit(
     files = [f for f in get_staged_status() if str(f.path).endswith(".py")]
 
     if not files:
-        ok("No staged files to format.")
+        ok("No staged files to lint.")
         return 0
 
     cmd = ["ruff", "check"] + get_ruff_arguments(get_ruff_config(config))
