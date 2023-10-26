@@ -34,7 +34,9 @@ class AutohooksRuffTestCase(TestCase):
         ), patch("importlib.util.find_spec", return_value=None):
             check_ruff_installed()
 
-    def test_get_ruff_config(self):
+    def test_get_ruff_config(
+        self,
+    ):
         config_path = get_test_config_path("pyproject.test.toml")
         self.assertTrue(config_path.is_file())
 
@@ -50,12 +52,17 @@ class AutohooksRuffTestCase(TestCase):
         args = get_ruff_arguments(None)
         self.assertEqual(args, DEFAULT_ARGUMENTS)
 
-    def test_get_ruff_arguments(self):
+    @patch("autohooks.plugins.ruff.ruff.get_ruff_config")
+    def test_get_ruff_arguments(
+        self,
+        _get_ruff_config: MagicMock,
+    ):
         config_path = get_test_config_path("pyproject.test.toml")
         args = get_ruff_arguments(
             load_config_from_pyproject_toml(config_path).get_config()
         )
         self.assertEqual(args, ["--test", "foo,bar", "--foo", "bar"])
+        _get_ruff_config.assert_not_called()
 
     @patch("autohooks.plugins.ruff.ruff.get_staged_status")
     def test_precommit_no_files(
@@ -79,7 +86,7 @@ class AutohooksRuffTestCase(TestCase):
         error_mock: MagicMock,
         out_mock: MagicMock,
         ok_mock: MagicMock,
-        _get_ruff_config,
+        _get_ruff_config: MagicMock,
         get_ruff_arguments_mock: MagicMock,
     ):
         code = """import subprocess
