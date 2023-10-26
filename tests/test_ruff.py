@@ -59,7 +59,9 @@ class AutohooksRuffTestCase(TestCase):
     ):
         config_path = get_test_config_path("pyproject.test.toml")
         args = get_ruff_arguments(
-            load_config_from_pyproject_toml(config_path).get_config()
+            load_config_from_pyproject_toml(config_path)
+            .get_config()
+            .get("tool", "autohooks", "plugins", "ruff")
         )
         self.assertEqual(args, ["--test", "foo,bar", "--foo", "bar"])
         _get_ruff_config.assert_not_called()
