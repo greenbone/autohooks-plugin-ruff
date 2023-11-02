@@ -37,9 +37,8 @@ def get_ruff_arguments(config: Optional[Config]) -> Iterable[str]:
     if not config:
         return DEFAULT_ARGUMENTS
 
-    ruff_config = get_ruff_config(config)
     arguments = ensure_iterable(
-        ruff_config.get_value("arguments", DEFAULT_ARGUMENTS)
+        config.get_value("arguments", DEFAULT_ARGUMENTS)
     )
 
     return arguments
