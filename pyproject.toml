@@ -14,7 +14,6 @@ authors = [
 readme = "README.md"
 homepage = "https://github.com/greenbone/autohooks-plugin-ruff"
 repository = "https://github.com/greeenbone/autohooks-plugin-ruff"
-documentation = ""
 # Full list: https://pypi.org/pypi?%3Aaction=list_classifiers
 classifiers = [
   "Development Status :: 5 - Production/Stable",
