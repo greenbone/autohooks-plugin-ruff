@@ -11,13 +11,13 @@ formatting via [ruff](https://github.com/astral-sh/ruff).
 
 ### Install using pip
 
+> [!NOTE] The `pip install` command does no longer work out-of-the-box in newer
+> distributions like Ubuntu >= 23.04 because of [PEP 668](https://peps.python.org/pep-0668).
+
 You can install the latest stable release of autohooks-plugin-ruff from the
 Python Package Index using [pip](https://pip.pypa.io/):
 
-    pip install autohooks-plugin-ruff
-
-Note the `pip` refers to the Python 3 package manager. In a environment where
-Python 2 is also available the correct command may be `pip3`.
+    python3 -m pip install --user autohooks-plugin-ruff
 
 ### Install using poetry
 
@@ -25,11 +25,17 @@ It is highly encouraged to use [poetry](https://python-poetry.org) for
 maintaining your project's dependencies. Normally autohooks-plugin-ruff is
 installed as a development dependency.
 
-    poetry install
+    poetry add --group dev autohooks-plugin-ruff
 
 ## Usage
 
-To activate the ruff autohooks plugin please add the following setting to your
+To activate the ruff autohooks plugin please run
+
+```shell
+poetry run autohooks plugins add autohooks.plugins.ruff
+```
+    
+or alternatively add the following setting to your
 *pyproject.toml* file.
 
 ```toml
@@ -65,6 +71,6 @@ first.
 
 ## License
 
-Copyright (C) 2023 [Greenbone AG](https://www.greenbone.net/)
+Copyright (C) 2023 - 2024 [Greenbone AG](https://www.greenbone.net/)
 
 Licensed under the [GNU General Public License v3.0 or later](LICENSE).
