@@ -8,6 +8,10 @@ jobs:
   deploy:
     permissions:
       id-token: write
-    uses: greenbone/workflows/.github/workflows/deploy-pypi.yml@main
-    with:
-      pypi-url: https://pypi.org/project/autohooks-plugin-ruff/
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/autohooks-plugin-ruff/
+    steps:
+      - name: Build and publish to PyPI
+        uses: greenbone/actions/pypi-upload@v3
