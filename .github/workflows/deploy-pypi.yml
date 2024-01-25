@@ -6,5 +6,8 @@ on:
 
 jobs:
   deploy:
+    permissions:
+      id-token: write
     uses: greenbone/workflows/.github/workflows/deploy-pypi.yml@main
-    secrets: inherit
+    with:
+      pypi-url: https://pypi.org/project/autohooks-plugin-ruff/
