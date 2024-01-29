@@ -20,6 +20,7 @@ jobs:
     with:
       lint-packages: autohooks tests
       python-version: ${{ matrix.python-version }}
+      linter: ruff
 
   test:
     strategy:

@@ -42,18 +42,11 @@ autohooks = ">=23.4.0"
 
 [tool.poetry.group.dev.dependencies]
 autohooks-plugin-black = ">=23.4.0"
-autohooks-plugin-isort = ">=23.3.0"
-autohooks-plugin-pylint = ">=23.4.0"
 coverage = ">=7.2.7"
 
 [tool.autohooks]
 mode = "poetry"
-pre-commit = [
-  "autohooks.plugins.black",
-  "autohooks.plugins.isort",
-  "autohooks.plugins.pylint",
-  "autohooks.plugins.ruff",
-]
+pre-commit = ["autohooks.plugins.black", "autohooks.plugins.ruff"]
 
 [tool.black]
 line-length = 80
@@ -71,10 +64,6 @@ exclude = '''
 )/
 '''
 
-[tool.isort]
-profile = "black"
-line_length = 80
-
 [tool.pontos.version]
 version-module-file = "autohooks/plugins/ruff/__version__.py"
 
@@ -82,6 +71,8 @@ version-module-file = "autohooks/plugins/ruff/__version__.py"
 exclude = [".pytest_cache", ".venv"]
 line-length = 80
 ignore = ["E731"]
+target-version = "py39"
+extend-select = ["I", "PLE", "PLW"]
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401"]
