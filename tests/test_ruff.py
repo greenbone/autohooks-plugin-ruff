@@ -9,10 +9,10 @@ from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from autohooks.api.git import StatusEntry
-from autohooks.config import load_config_from_pyproject_toml
 from pontos.testing import temp_file
 
+from autohooks.api.git import StatusEntry
+from autohooks.config import load_config_from_pyproject_toml
 from autohooks.plugins.ruff.ruff import (
     DEFAULT_ARGUMENTS,
     check_ruff_installed,
