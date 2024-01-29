@@ -96,8 +96,12 @@ class AutohooksRuffTestCase(TestCase):
         get_ruff_arguments_mock: MagicMock,
     ):
         code = """import subprocess
+
 status = subprocess.Popen(
-    cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    cmd,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+)
 """
         get_ruff_arguments_mock.return_value = DEFAULT_ARGUMENTS
 
@@ -114,7 +118,7 @@ status = subprocess.Popen(
             ok_mock.assert_not_called()
             out_mock.assert_called_once_with("Found 1 error.")
             error_mock.assert_called_once_with(
-                f"{file.absolute()}:3:5: F821 Undefined name `cmd`"
+                f"{file.absolute()}:4:5: F821 Undefined name `cmd`"
             )
 
             self.assertEqual(ret, 1)
