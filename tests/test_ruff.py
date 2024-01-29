@@ -28,10 +28,14 @@ def get_test_config_path(name):
 
 class AutohooksRuffTestCase(TestCase):
     def test_ruff_installed(self):
-        with self.assertRaisesRegex(
-            RuntimeError,
-            "Could not find ruff. Please add ruff to your python environment",
-        ), patch("importlib.util.find_spec", return_value=None):
+        with (
+            self.assertRaisesRegex(
+                RuntimeError,
+                "Could not find ruff. Please add ruff to your python "
+                "environment",
+            ),
+            patch("importlib.util.find_spec", return_value=None),
+        ):
             check_ruff_installed()
 
     def test_get_ruff_config(
