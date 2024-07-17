@@ -116,8 +116,8 @@ status = subprocess.Popen(
             ret = precommit()
 
             ok_mock.assert_not_called()
-            out_mock.assert_any_call("Found 1 error.")
-            error_mock.assert_any_call(
+            out_mock.assert_called_once_with("Found 1 error.")
+            error_mock.assert_called_once_with(
                 f"{file.absolute()}:4:5: F821 Undefined name `cmd`"
             )
 
