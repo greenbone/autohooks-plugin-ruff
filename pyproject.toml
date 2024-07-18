@@ -70,9 +70,11 @@ version-module-file = "autohooks/plugins/ruff/__version__.py"
 [tool.ruff]
 exclude = [".pytest_cache", ".venv"]
 line-length = 80
-ignore = ["E731"]
 target-version = "py39"
+
+[tool.ruff.lint]
+ignore = ["E731"]
 extend-select = ["I", "PLE", "PLW"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
