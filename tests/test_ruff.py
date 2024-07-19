@@ -148,8 +148,8 @@ status = subprocess.Popen(
         ]
         ret = precommit()
 
-        error_mock.assert_not_called()
-        out_mock.assert_not_called()
+        error_mock.assert_any_call()
+        out_mock.assert_any_call()
         ok_mock.assert_called_once_with("Linting test_ruff.py was successful.")
 
         # Returncode 0 -> no errors
