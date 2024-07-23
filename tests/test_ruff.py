@@ -70,7 +70,7 @@ class AutohooksRuffTestCase(TestCase):
         )
         self.assertIsInstance(args, list, "ensures args is a list")
         self.assertEqual(args, ["--test", "foo,bar", "--foo", "bar"])
-        
+
         _get_ruff_config.assert_not_called()
 
     @patch("autohooks.plugins.ruff.ruff.get_staged_status")
