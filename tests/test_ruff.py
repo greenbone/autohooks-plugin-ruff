@@ -55,6 +55,7 @@ class AutohooksRuffTestCase(TestCase):
     def test_get_default_ruff_arguments(self):
         args = get_ruff_arguments(None)
         self.assertEqual(args, DEFAULT_ARGUMENTS)
+        self.assertIsInstance(args, list, "ensures args is a list")
 
     @patch("autohooks.plugins.ruff.ruff.get_ruff_config")
     def test_get_ruff_arguments(
@@ -67,7 +68,9 @@ class AutohooksRuffTestCase(TestCase):
             .get_config()
             .get("tool", "autohooks", "plugins", "ruff")
         )
+        self.assertIsInstance(args, list, "ensures args is a list")
         self.assertEqual(args, ["--test", "foo,bar", "--foo", "bar"])
+        
         _get_ruff_config.assert_not_called()
 
     @patch("autohooks.plugins.ruff.ruff.get_staged_status")
