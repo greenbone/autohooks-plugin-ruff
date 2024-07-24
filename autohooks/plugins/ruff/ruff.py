@@ -13,7 +13,7 @@ from autohooks.api.git import get_staged_status, stash_unstaged_changes
 from autohooks.config import Config
 from autohooks.precommit.run import ReportProgress
 
-DEFAULT_ARGUMENTS = []
+DEFAULT_ARGUMENTS = ["--output-format=concise"]
 
 
 def check_ruff_installed() -> None:
