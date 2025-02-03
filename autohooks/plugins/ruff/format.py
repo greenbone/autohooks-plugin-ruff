@@ -1,14 +1,17 @@
-# SPDX-FileCopyrightText: 2023 Greenbone AG
+# SPDX-FileCopyrightText: 2025 Greenbone AG
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 import subprocess
-import sys
 from typing import Optional
 
-from autohooks.api import error, ok, out
-from autohooks.api.git import get_staged_status, stash_unstaged_changes
+from autohooks.api import error, ok
+from autohooks.api.git import (
+    get_staged_status,
+    stage_files_from_status_list,
+    stash_unstaged_changes,
+)
 from autohooks.config import Config
 from autohooks.plugins.ruff.utils import (
     check_ruff_installed,
@@ -17,7 +20,12 @@ from autohooks.plugins.ruff.utils import (
 )
 from autohooks.precommit.run import ReportProgress
 
-DEFAULT_ARGUMENTS = ["--output-format=concise"]
+DEFAULT_ARGUMENTS = []
+
+
+def get_ruff_format_config(config: Optional[Config]) -> Optional[Config]:
+    config = get_ruff_config(config)
+    return config.get("format") if config else None
 
 
 def precommit(
@@ -33,8 +41,8 @@ def precommit(
         ok("No staged files to lint.")
         return 0
 
-    cmd = ["ruff", "check"] + get_ruff_arguments(
-        get_ruff_config(config), DEFAULT_ARGUMENTS
+    cmd = ["ruff", "format"] + get_ruff_arguments(
+        get_ruff_format_config(config), DEFAULT_ARGUMENTS
     )
 
     if report_progress:
@@ -49,23 +57,13 @@ def precommit(
                     check=True,
                     capture_output=True,
                 )
-                ok(f"Linting {file.path} was successful.")
-            except subprocess.CalledProcessError as e:
-                ret = e.returncode
-                format_errors = (
-                    e.stdout.decode(
-                        encoding=sys.getdefaultencoding(), errors="replace"
-                    )
-                    .rstrip()
-                    .split("\n")
-                )
-                for line in format_errors:
-                    if ".py" in line:
-                        error(line)
-                    else:
-                        out(line)
-            finally:
+                ok(f"Formatting {file.path} was successful.")
                 if report_progress:
                     report_progress.update()
+            except subprocess.CalledProcessError as e:
+                error(f"Failed formatting {file.path}")
+                raise e from None
+
+        stage_files_from_status_list(files)
 
         return ret
