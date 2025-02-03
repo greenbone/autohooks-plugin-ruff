@@ -3,45 +3,21 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-import importlib.util
 import subprocess
 import sys
-from typing import Iterable, List, Optional, Union
+from typing import Optional
 
 from autohooks.api import error, ok, out
 from autohooks.api.git import get_staged_status, stash_unstaged_changes
 from autohooks.config import Config
+from autohooks.plugins.ruff.utils import (
+    check_ruff_installed,
+    get_ruff_arguments,
+    get_ruff_config,
+)
 from autohooks.precommit.run import ReportProgress
 
 DEFAULT_ARGUMENTS = ["--output-format=concise"]
-
-
-def check_ruff_installed() -> None:
-    if importlib.util.find_spec("ruff") is None:
-        raise RuntimeError(
-            "Could not find ruff. Please add ruff to your python environment"
-        )
-
-
-def get_ruff_config(config: Config) -> Config:
-    return config.get("tool", "autohooks", "plugins", "ruff")
-
-
-def ensure_iterable(value: Union[str, List[str]]) -> List[str]:
-    if isinstance(value, str):
-        return [value]
-    return value
-
-
-def get_ruff_arguments(config: Optional[Config]) -> Iterable[str]:
-    if not config:
-        return DEFAULT_ARGUMENTS
-
-    arguments = ensure_iterable(
-        config.get_value("arguments", DEFAULT_ARGUMENTS)
-    )
-
-    return arguments
 
 
 def precommit(
@@ -57,7 +33,9 @@ def precommit(
         ok("No staged files to lint.")
         return 0
 
-    cmd = ["ruff", "check"] + get_ruff_arguments(get_ruff_config(config))
+    cmd = ["ruff", "check"] + get_ruff_arguments(
+        get_ruff_config(config), DEFAULT_ARGUMENTS
+    )
 
     if report_progress:
         report_progress.init(len(files))

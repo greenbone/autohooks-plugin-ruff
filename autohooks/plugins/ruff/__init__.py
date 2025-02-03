@@ -3,4 +3,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-from .ruff import precommit
+from .check import precommit
