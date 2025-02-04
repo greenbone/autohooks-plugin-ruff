@@ -5,7 +5,7 @@
 [![PyPI release](https://img.shields.io/pypi/v/autohooks-plugin-ruff.svg)](https://pypi.org/project/autohooks-plugin-ruff/)
 
 An [autohooks](https://github.com/greenbone/autohooks) plugin for python code
-formatting via [ruff](https://github.com/astral-sh/ruff).
+linting and formatting via [ruff](https://github.com/astral-sh/ruff).
 
 ## Installation
 
@@ -17,7 +17,9 @@ formatting via [ruff](https://github.com/astral-sh/ruff).
 You can install the latest stable release of autohooks-plugin-ruff from the
 Python Package Index using [pip](https://pip.pypa.io/):
 
-    python3 -m pip install --user autohooks-plugin-ruff
+```sh
+python3 -m pip install --user autohooks-plugin-ruff
+```
 
 ### Install using poetry
 
@@ -25,25 +27,44 @@ It is highly encouraged to use [poetry](https://python-poetry.org) for
 maintaining your project's dependencies. Normally autohooks-plugin-ruff is
 installed as a development dependency.
 
-    poetry add --group dev autohooks-plugin-ruff
+```sh
+poetry add --group dev autohooks-plugin-ruff
+```
 
 ## Usage
 
-To activate the ruff autohooks plugin please run
+To activate the ruff autohooks plugin for linting please run
 
 ```shell
-poetry run autohooks plugins add autohooks.plugins.ruff
+poetry run autohooks plugins add autohooks.plugins.ruff.check
 ```
-    
+
 or alternatively add the following setting to your
 *pyproject.toml* file.
 
 ```toml
 [tool.autohooks]
-pre-commit = ["autohooks.plugins.ruff"]
+pre-commit = ["autohooks.plugins.ruff.check"]
 ```
 
 What the plugin actually does is `ruff check .` on git commit, so you should be
+able to use the exact same settings as in [ruff's docs](https://beta.ruff.rs/docs/settings/).
+
+To activate the ruff autohooks plugin for code formatting please run
+
+```shell
+poetry run autohooks plugins add autohooks.plugins.ruff.format
+```
+
+or alternatively add the following setting to your
+*pyproject.toml* file.
+
+```toml
+[tool.autohooks]
+pre-commit = ["autohooks.plugins.ruff.format"]
+```
+
+What the plugin actually does is `ruff format .` on git commit, so you should be
 able to use the exact same settings as in [ruff's docs](https://beta.ruff.rs/docs/settings/).
 
 ## Notes
@@ -71,6 +92,6 @@ first.
 
 ## License
 
-Copyright (C) 2023 - 2024 [Greenbone AG](https://www.greenbone.net/)
+Copyright (C) 2023 - 2025 [Greenbone AG](https://www.greenbone.net/)
 
 Licensed under the [GNU General Public License v3.0 or later](LICENSE).
