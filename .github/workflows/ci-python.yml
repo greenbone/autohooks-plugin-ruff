@@ -21,6 +21,7 @@ jobs:
       lint-packages: autohooks tests
       python-version: ${{ matrix.python-version }}
       linter: ruff check
+      formatter: ruff format --diff
 
   test:
     strategy:
