@@ -25,14 +25,14 @@ trio = ["trio (>=0.26.1)"]
 
 [[package]]
 name = "autohooks"
-version = "24.2.0"
+version = "25.2.0"
 description = "Library for managing git hooks"
 optional = false
-python-versions = ">=3.9,<4.0"
+python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "autohooks-24.2.0-py3-none-any.whl", hash = "sha256:a2097de2e092fa7b78a17b63b73980d3cc42b01065feb2caf0d41e2bb506621b"},
-    {file = "autohooks-24.2.0.tar.gz", hash = "sha256:ee929a9f7ff68e61c73201de817b679df168b4465be1026550a71956b419200b"},
+    {file = "autohooks-25.2.0-py3-none-any.whl", hash = "sha256:5a2ed5fc03d899725638d2ca6bcb367f025a6196b225a5ea177e502fdf1bb065"},
+    {file = "autohooks-25.2.0.tar.gz", hash = "sha256:e306a24801fbc815628ebe48b063e2853a0857eb00bbdae733175e06e0ce8a84"},
 ]
 
 [package.dependencies]
@@ -671,4 +671,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "e9950efee3acb43ee8db4336dbb13f4153a1d563f9627902a834a8e9258cfa3d"
+content-hash = "d538403169b18cacfa85dd914d0d643de6ed4f41bd209cc67e0ce2dbf56c3492"

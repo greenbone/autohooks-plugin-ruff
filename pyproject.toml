@@ -36,7 +36,7 @@ keywords = ["git", "formatting", "linting", "hooks", "ruff"]
 [tool.poetry.dependencies]
 python = "^3.9"
 ruff = ">=0.0.272"
-autohooks = ">=23.4.0"
+autohooks = ">=25.2.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = ">=7.2.7"
