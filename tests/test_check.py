@@ -10,13 +10,12 @@ from unittest.mock import MagicMock, patch
 from pontos.testing import temp_file
 
 from autohooks.api.git import StatusEntry
-from autohooks.config import load_config_from_pyproject_toml
+from autohooks.config import AutohooksConfig
 from autohooks.plugins.ruff.check import (
-    DEFAULT_ARGUMENTS,
-    get_ruff_arguments,
-    get_ruff_config,
+    get_ruff_check_config,
     precommit,
 )
+from autohooks.precommit.run import ReportProgress
 
 
 def get_test_config_path(name):
@@ -27,33 +26,45 @@ class AutohooksRuffCheckTestCase(TestCase):
     def test_get_ruff_config(
         self,
     ):
-        config_path = get_test_config_path("pyproject.test.toml")
-        self.assertTrue(config_path.is_file())
+        autohooks_config = AutohooksConfig.from_string(
+            """
+[tool.autohooks.plugins.ruff]
+arguments = [
+    "--test", "foo,bar",
+    "--foo", "bar",
+]
+"""
+        )
 
-        autohooks_config = load_config_from_pyproject_toml(config_path)
-
-        ruff_config = get_ruff_config(autohooks_config.get_config())
+        ruff_config = get_ruff_check_config(autohooks_config.get_config())
         self.assertEqual(
             ruff_config.get_value("arguments"),
             ["--test", "foo,bar", "--foo", "bar"],
         )
 
-    @patch("autohooks.plugins.ruff.check.get_ruff_config")
-    def test_get_ruff_arguments(
+    def test_get_ruff_config_prefer_check_config(
         self,
-        _get_ruff_config: MagicMock,
     ):
-        config_path = get_test_config_path("pyproject.test.toml")
-        args = get_ruff_arguments(
-            load_config_from_pyproject_toml(config_path)
-            .get_config()
-            .get("tool", "autohooks", "plugins", "ruff"),
-            DEFAULT_ARGUMENTS,
+        autohooks_config = AutohooksConfig.from_string(
+            """
+[tool.autohooks.plugins.ruff]
+arguments = [
+    "--bar", "foo,bar",
+    "--baz", "bar",
+]
+[tool.autohooks.plugins.ruff.check]
+arguments = [
+    "--test", "foo,bar",
+    "--foo", "bar",
+]
+"""
         )
-        self.assertIsInstance(args, list, "ensures args is a list")
-        self.assertEqual(args, ["--test", "foo,bar", "--foo", "bar"])
 
-        _get_ruff_config.assert_not_called()
+        ruff_config = get_ruff_check_config(autohooks_config.get_config())
+        self.assertEqual(
+            ruff_config.get_value("arguments"),
+            ["--test", "foo,bar", "--foo", "bar"],
+        )
 
     @patch("autohooks.plugins.ruff.check.get_staged_status")
     def test_precommit_no_files(
@@ -65,8 +76,6 @@ class AutohooksRuffCheckTestCase(TestCase):
 
         self.assertEqual(ret, 0)
 
-    @patch("autohooks.plugins.ruff.check.get_ruff_arguments")
-    @patch("autohooks.plugins.ruff.check.get_ruff_config")
     @patch("autohooks.plugins.ruff.check.ok")
     @patch("autohooks.plugins.ruff.check.out")
     @patch("autohooks.plugins.ruff.check.error")
@@ -77,9 +86,8 @@ class AutohooksRuffCheckTestCase(TestCase):
         error_mock: MagicMock,
         out_mock: MagicMock,
         ok_mock: MagicMock,
-        _get_ruff_config: MagicMock,
-        get_ruff_arguments_mock: MagicMock,
     ):
+        config = AutohooksConfig.from_string("")
         code = """import subprocess
 
 status = subprocess.Popen(
@@ -88,7 +96,6 @@ status = subprocess.Popen(
     stderr=subprocess.PIPE,
 )
 """
-        get_ruff_arguments_mock.return_value = DEFAULT_ARGUMENTS
 
         with temp_file(code, name="test.py") as file:
             get_staged_status_mock.return_value = [
@@ -98,7 +105,7 @@ status = subprocess.Popen(
                 )
             ]
 
-            ret = precommit()
+            ret = precommit(config.get_config())
 
             ok_mock.assert_not_called()
             out_mock.assert_called_once_with("Found 1 error.")
@@ -108,8 +115,6 @@ status = subprocess.Popen(
 
             self.assertEqual(ret, 1)
 
-    @patch("autohooks.plugins.ruff.check.get_ruff_arguments")
-    @patch("autohooks.plugins.ruff.check.get_ruff_config")
     @patch("autohooks.plugins.ruff.check.ok")
     @patch("autohooks.plugins.ruff.check.out")
     @patch("autohooks.plugins.ruff.check.error")
@@ -120,22 +125,22 @@ status = subprocess.Popen(
         error_mock: MagicMock,
         out_mock: MagicMock,
         ok_mock: MagicMock,
-        _get_ruff_config,
-        get_ruff_arguments_mock: MagicMock,
     ):
-        get_ruff_arguments_mock.return_value = DEFAULT_ARGUMENTS
-
+        progress = MagicMock(spec=ReportProgress)
+        config = AutohooksConfig.from_string("")
         get_staged_status_mock.return_value = [
             StatusEntry(
                 status_string="M  test_check.py",
                 root_path=Path(__file__).parent,
             )
         ]
-        ret = precommit()
+        ret = precommit(config.get_config(), progress)
 
+        progress.init.assert_called_once_with(1)
         error_mock.assert_not_called()
         out_mock.assert_not_called()
         ok_mock.assert_called_once_with("Linting test_check.py was successful.")
+        progress.update.assert_called_once()
 
         # Returncode 0 -> no errors
         self.assertEqual(ret, 0)

@@ -20,6 +20,13 @@ from autohooks.precommit.run import ReportProgress
 DEFAULT_ARGUMENTS = ["--output-format=concise"]
 
 
+def get_ruff_check_config(config: Optional[Config]) -> Optional[Config]:
+    config = get_ruff_config(config)
+    if config and config.has_key("check"):
+        config = config.get("check")
+    return config
+
+
 def precommit(
     config: Optional[Config] = None,
     report_progress: Optional[ReportProgress] = None,
@@ -34,7 +41,7 @@ def precommit(
         return 0
 
     cmd = ["ruff", "check"] + get_ruff_arguments(
-        get_ruff_config(config), DEFAULT_ARGUMENTS
+        get_ruff_check_config(config), DEFAULT_ARGUMENTS
     )
 
     if report_progress:
