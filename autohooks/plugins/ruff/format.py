@@ -49,7 +49,7 @@ def precommit(
         report_progress.init(len(files))
 
     with stash_unstaged_changes(files):
-        ret = 0
+        has_error = False
         for file in files:
             try:
                 subprocess.run(
@@ -61,9 +61,10 @@ def precommit(
                 if report_progress:
                     report_progress.update()
             except subprocess.CalledProcessError as e:
-                error(f"Failed formatting {file.path}")
-                raise e from None
+                error(f"Failed formatting {file.path}. {e.stderr.decode()}")
+                has_error = True
 
-        stage_files_from_status_list(files)
+        if not has_error:
+            stage_files_from_status_list(files)
 
-        return ret
+        return 1 if has_error else 0
