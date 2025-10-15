@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch
 
 from autohooks.config import AutohooksConfig
+
 from autohooks.plugins.ruff.utils import (
     check_ruff_installed,
     get_ruff_arguments,

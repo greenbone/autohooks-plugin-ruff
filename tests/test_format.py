@@ -7,15 +7,15 @@ from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from pontos.testing import temp_file
-
 from autohooks.api.git import StatusEntry
 from autohooks.config import AutohooksConfig
+from autohooks.precommit.run import ReportProgress
+from pontos.testing import temp_file
+
 from autohooks.plugins.ruff.format import (
     get_ruff_format_config,
     precommit,
 )
-from autohooks.precommit.run import ReportProgress
 
 
 class AutohooksRuffFormatTestCase(TestCase):
