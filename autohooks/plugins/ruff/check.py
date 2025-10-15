@@ -10,12 +10,13 @@ from typing import Optional
 from autohooks.api import error, ok, out
 from autohooks.api.git import get_staged_status, stash_unstaged_changes
 from autohooks.config import Config
+from autohooks.precommit.run import ReportProgress
+
 from autohooks.plugins.ruff.utils import (
     check_ruff_installed,
     get_ruff_arguments,
     get_ruff_config,
 )
-from autohooks.precommit.run import ReportProgress
 
 DEFAULT_ARGUMENTS = ["--output-format=concise"]
 
