@@ -5,7 +5,6 @@
 
 import subprocess
 import sys
-from typing import Optional
 
 from autohooks.api import error, ok, out
 from autohooks.api.git import get_staged_status, stash_unstaged_changes
@@ -21,7 +20,7 @@ from autohooks.plugins.ruff.utils import (
 DEFAULT_ARGUMENTS = ["--output-format=concise"]
 
 
-def get_ruff_check_config(config: Optional[Config]) -> Optional[Config]:
+def get_ruff_check_config(config: Config | None) -> Config | None:
     config = get_ruff_config(config)
     if config and config.has_key("check"):
         config = config.get("check")
@@ -29,8 +28,8 @@ def get_ruff_check_config(config: Optional[Config]) -> Optional[Config]:
 
 
 def precommit(
-    config: Optional[Config] = None,
-    report_progress: Optional[ReportProgress] = None,
+    config: Config | None = None,
+    report_progress: ReportProgress | None = None,
     **kwargs,  # pylint: disable=unused-argument
 ) -> int:
     check_ruff_installed()

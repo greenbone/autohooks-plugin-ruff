@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 import importlib.util
-from typing import Optional, Union
 
 from autohooks.config import Config
 
@@ -15,21 +14,19 @@ def check_ruff_installed() -> None:
         )
 
 
-def get_ruff_config(config: Optional[Config]) -> Optional[Config]:
+def get_ruff_config(config: Config | None) -> Config | None:
     return (
         config.get("tool", "autohooks", "plugins", "ruff") if config else None
     )
 
 
-def ensure_iterable(value: Union[str, list[str]]) -> list[str]:
+def ensure_iterable(value: str | list[str]) -> list[str]:
     if isinstance(value, str):
         return [value]
     return value
 
 
-def get_ruff_arguments(
-    config: Optional[Config], defaults: list[str]
-) -> list[str]:
+def get_ruff_arguments(config: Config | None, defaults: list[str]) -> list[str]:
     if not config:
         return defaults
 

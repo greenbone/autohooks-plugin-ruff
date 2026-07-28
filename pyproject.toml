@@ -44,7 +44,7 @@ coverage = ">=7.2.7"
 
 [tool.autohooks]
 mode = "poetry"
-pre-commit = ["autohooks.plugins.ruff", "autohooks.plugins.ruff.format"]
+pre-commit = ["autohooks.plugins.ruff.check", "autohooks.plugins.ruff.format"]
 
 [tool.pontos.version]
 version-module-file = "autohooks/plugins/ruff/__version__.py"

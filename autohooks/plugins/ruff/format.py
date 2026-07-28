@@ -4,7 +4,6 @@
 #
 
 import subprocess
-from typing import Optional
 
 from autohooks.api import error, ok
 from autohooks.api.git import (
@@ -24,14 +23,14 @@ from autohooks.plugins.ruff.utils import (
 DEFAULT_ARGUMENTS = []
 
 
-def get_ruff_format_config(config: Optional[Config]) -> Optional[Config]:
+def get_ruff_format_config(config: Config | None) -> Config | None:
     config = get_ruff_config(config)
     return config.get("format") if config else None
 
 
 def precommit(
-    config: Optional[Config] = None,
-    report_progress: Optional[ReportProgress] = None,
+    config: Config | None = None,
+    report_progress: ReportProgress | None = None,
     **kwargs,  # pylint: disable=unused-argument
 ) -> int:
     check_ruff_installed()
